@@ -26,6 +26,11 @@ async function parseResponse<T>(response: Response): Promise<T> {
     throw new Error(`Request failed with status ${response.status}`)
   }
 
+  // Return empty object for 204 No Content responses
+  if (response.status === 204) {
+    return {} as T
+  }
+
   return (await response.json()) as T
 }
 
@@ -99,7 +104,7 @@ function App() {
     try {
       const updated = await parseResponse<Partial<Todo> & { id: number | string }>(
         await fetch(`${TODOS_ENDPOINT}/${todo.id}`, {
-          method: 'PATCH',
+          method: 'PUT',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ completed: !todo.completed }),
         }),
